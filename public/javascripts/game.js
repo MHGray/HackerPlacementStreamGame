@@ -21,10 +21,44 @@ let game = {
 
   init: function(){
     /* initialize game variables */
+    return console.log('working');
   },
 
-  handleCommand: function(user, command){
+  handleMessage: function(user, msg){
     /* Takes a users command and executes the correct function */
+    let command = msg.split(" ")[0];
+
+    switch (command) {
+      case '!hack':
+
+        break;
+      case '!stats':
+
+        break;
+      case '!craft':
+
+        break;
+      case '!offer':
+        
+        break;
+      case '!accept':
+
+        break;
+      case '!confirm':
+
+        break;
+      default:
+        //bad command
+
+    }
+
+    !hack {node #}: If you are active player hack the numbered node
+    !stats: Display current cr, fvr, scrt, prgm, inf, and items.
+    !craft: Displays the list of available crafting options.
+    !craft {id}: Craft a particular recipe.
+    !offer {item} {player}: Offers an item to a player.
+    !accept {player} {item(optional)}: Accepts and offers item in exchange optional.
+    !confirm {player}: Finishes the offer command and will swap items.
   },
 
   tick: function(){
