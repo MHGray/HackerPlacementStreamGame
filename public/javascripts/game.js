@@ -1,14 +1,14 @@
 let game = {
   // variables
-  this.allPlayers = [], // All players
-  this.players = [], // Active players
-  this.nodes = [], // Active nodes
-  this.nodeDeck = [], // All normal nodes
-  this.corpNodeDeck = [], // All corp nodes
-  this.eventQueue = [], //Information for overlay to process and draw
+  allPlayers: [], // All players
+  players: [], // Active players
+  nodes: [], // Active nodes
+  nodeDeck: [], // All normal nodes
+  corpNodeDeck: [], // All corp nodes
+  eventQueue: [], //Information for overlay to process and draw
 
   // functions
-  this.load = function(){
+  load: function(){
     /* this will load  players/items/etc from the database */
 
     //Make database call. Return an array of Players
@@ -19,17 +19,15 @@ let game = {
     })
   },
 
-  this.init = function(){
+  init: function(){
     /* initialize game variables */
   },
 
-  this.handleCommand = function(user, command){
+  handleCommand: function(user, command){
     /* Takes a users command and executes the correct function */
   },
 
-  this.tick = function(){
+  tick: function(){
     /* process a game tick */
   },
-
-
 }
