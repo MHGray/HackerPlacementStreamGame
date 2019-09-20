@@ -39,7 +39,7 @@ let game = {
 
         break;
       case '!offer':
-        
+
         break;
       case '!accept':
 
@@ -52,13 +52,13 @@ let game = {
 
     }
 
-    !hack {node #}: If you are active player hack the numbered node
-    !stats: Display current cr, fvr, scrt, prgm, inf, and items.
-    !craft: Displays the list of available crafting options.
-    !craft {id}: Craft a particular recipe.
-    !offer {item} {player}: Offers an item to a player.
-    !accept {player} {item(optional)}: Accepts and offers item in exchange optional.
-    !confirm {player}: Finishes the offer command and will swap items.
+    // !hack {node #}: If you are active player hack the numbered node
+    // !stats: Display current cr, fvr, scrt, prgm, inf, and items.
+    // !craft: Displays the list of available crafting options.
+    // !craft {id}: Craft a particular recipe.
+    // !offer {item} {player}: Offers an item to a player.
+    // !accept {player} {item(optional)}: Accepts and offers item in exchange optional.
+    // !confirm {player}: Finishes the offer command and will swap items.
   },
 
   tick: function(){
