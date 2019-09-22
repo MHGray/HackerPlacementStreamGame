@@ -74,7 +74,4 @@ module.exports = mongoose.model('Hacker', Hacker);
   augments: ,
   items:
 }
-
-
-
 */
