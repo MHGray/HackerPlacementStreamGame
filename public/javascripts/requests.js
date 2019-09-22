@@ -19,6 +19,9 @@ let requestManager = {
       }
     };
     xhttp.open("POST", url, true);
-    xhttp.send();
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send(JSON.stringify(data));
   }
 }
+
+requestManager.post({name:"bob", credits:30}, "http://localhost:3000/game", console.log)
