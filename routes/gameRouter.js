@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-//Database Stuffs
 const mongoose = require('mongoose');
 
 const mongoDB = 'mongodb://localhost:27017/twitch';
@@ -35,8 +34,11 @@ router.post('/overlay', function(req,res,next){
   res.send();
 });
 
-router.post('/chat',function(req,res,next){
+const fs = require('fs');
 
+router.post('/chat',function(req,res,next){
+  console.log(req.body)
+  res.send();
 });
 
 module.exports = router;

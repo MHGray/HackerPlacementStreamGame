@@ -2,7 +2,7 @@
 
 #### Commands
 !hack {node #}: If you are active player hack the numbered node
-!node {#}: Get info on the specified node, Requirements and Rewards
+!node {node #}: Get info on the specified node, Requirements and Rewards
 !stats: Display current cr, fvr, scrt, prgm, inf, and items.
 !craft: Displays the list of available crafting options.
 !craft {id}: Craft a particular recipe.
