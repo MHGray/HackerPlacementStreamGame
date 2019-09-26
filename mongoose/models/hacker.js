@@ -9,51 +9,64 @@ let Hacker = new Schema({
   },
   image: {
     type: String,
-    required: false
+    required: false,
+    default: ""
   },
   active: {
     type: Boolean,
-    required: true
+    required: false,
+    default: false
+
   },
   lastMsg: {
     type: Date,
-    required: false
+    required: false,
+    default: new Date()
   },
   credits: {
     type: Number,
-    required: true
+    required: true,
+    default: 1
   },
   favors: {
     type: Number,
-    required: true
+    required: true,
+    default: 0
   },
   secrets: {
     type: Number,
-    required: true
+    required: true,
+    default: 0
   },
   programs: {
     type: Number,
-    required: true
+    required: true,
+    default: 0
   },
   infamy: {
     type: Number,
-    required: true
+    required: true,
+    default: 0
   },
-  currentNodeName: {
-    type: String,
-    required: false
+  currentNodeId: {
+    type: Number,
+    required: false,
+    default: -1
   },
   costumes: {
     type: Array,
-    required: false
+    required: false,
+    default: []
   },
   augments: {
     type: Array,
-    required: false
+    required: false,
+    default: []
   },
   items: {
     type: Array,
-    required: false
+    required: false,
+    default: []
   }
 });
 
