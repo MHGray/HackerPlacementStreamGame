@@ -11,9 +11,6 @@ var Node = require('./../mongoose/models/node');
 var Item = require('./../mongoose/models/item');
 var Augment = require('./../mongoose/models/augment');
 
-let node = new Node({name: "test"});
-node.save();
-
 let game = {
   players: [], // Active players
   nodes: [], //Active nodes
@@ -21,17 +18,26 @@ let game = {
   nodeDeck: [],
   playerDeck: [],
   corpNodeDeck: [],
+  
   eventQueue: [], //Information for overlay to process and draw
 
   // functions
   load: function(){
     /* this will load  players/items/etc from the database */
     Hacker.find({})
-      .then((res)=>{
+      .then(res=>{
         this.playerDeck = res;
       })
-      .catch((err,res) =>{
+      .catch(err =>{
         console.log(err);
+      })
+
+    Node.find({})
+      .then(res=>{
+        this.nodeDeck = res;
+      })
+      .catch(err=>{
+        console.log(`Node database read error: ${err}`);
       })
     //Make database call. Return an array of Players
   },
