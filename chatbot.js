@@ -26,7 +26,7 @@ function handleMessage(channel, user, message, self){
           name: "hack",
           target: targetNum
         };
-        sendRequest(user, data);
+        sendRequest(user.username, data);
       }else{
         client
           .say(channel, "That is an invalid node number")
@@ -42,7 +42,7 @@ function handleMessage(channel, user, message, self){
           name: "node",
           target: nodeNum
         };
-        sendRequest(user, data);
+        sendRequest(user.username, data);
       }else{
         client
           .say(channel, "That is an invalid node number")
@@ -51,7 +51,7 @@ function handleMessage(channel, user, message, self){
       }
       break;
     case "!stats":
-      sendRequest(user, {name: "stats", target: null});
+      sendRequest(user.username, {name: "stats", target: null});
       break;
     case "!craft":
       //TODO Build crafting stuffs
@@ -80,14 +80,8 @@ function sendRequest(user, command){
   });
 }
 
-//testing
-setTimeout(function(){
-  console.log("Sending request")
-  handleMessage("phlip45", 'phlip45', "!node 3", null)
-}, 2000);
-
 // Finally, connect to the channel
-//client.connect()
-//  .catch((err) => console.log('chatbot error occurred: ', err));
+client.connect()
+ .catch((err) => console.log('chatbot error occurred: ', err));
 
 module.exports = client;
