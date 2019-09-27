@@ -2,9 +2,6 @@ const express = require('express');
 const router = express.Router();
 var game = require('./../game/game');
 
-
-
-
 router.get('/', function(req,res,next){
   // console.log("Query: ", req.query);
   res.render('workerPlacement');
