@@ -18,7 +18,7 @@ let game = {
   nodeDeck: [],
   playerDeck: [],
   corpNodeDeck: [],
-  
+
   eventQueue: [], //Information for overlay to process and draw
 
   // functions
@@ -47,67 +47,80 @@ let game = {
     return console.log('working');
   },
 
-  test: function(test){
-    this.allPlayers.push(test);
-    console.log(this.allPlayers);
-  },
+
 
   handleCommand: function(user, command){
     /* Takes a users command and executes the correct function */
+    return new Promise((resolve,reject) =>{
+      switch (command.name) {
+        case 'hack':
+          Hacker.findOne({user:user})
+            .then(res=>{
+              if(res == null){
+                let newUser = new Hacker({user:user});
+                newUser.save()
+                  .then(final => resolve("New Hacker Created"));
+              }else{
+                res.credits += 20;
+                res.save()
+                  .then(final => resolve("Hack Success"))
+                  .catch(err => console.log("uh oh", err));
+              }
+            })
+            .catch(err =>{
+              console.log(err);
+            })
+
+          break;
+        case 'node':
+          Hacker.findOne({user:user})
+            .then(res=>{
+              if(res == null){
+                let newUser = new Hacker({user:user});
+                newUser.save();
+              }else{
+                res.credits += 20;
+                res.save();
+              }
+            })
+            .catch(err =>{
+              console.log(err);
+            })
+
+          break;
+        case 'stats':
+          Hacker.findOne({user:user})
+            .then(res=>{
+              if(res == null){
+                let newUser = new Hacker({user:user});
+                newUser.save();
+              }else{
+                res.credits += 20;
+                res.save();
+              }
+            })
+            .catch(err =>{
+              console.log(err);
+            })
+
+          break;
+        case 'craft':
+
+          break;
+        case 'offer':
+
+          break;
+        case 'accept':
+
+          break;
+        case 'confirm':
+
+          break;
+        default:
+      }
+    })
 
 
-    switch (command.name) {
-      case 'hack':
-        Hacker.findOne({user:user})
-          .then(res=>{
-            if(res == null){
-              let newUser = new Hacker({user:user});
-              newUser.save();
-            }else{
-              res.credits += 20;
-              res.save();
-            }
-          })
-          .catch(err =>{
-            console.log(err);
-          })
-
-        break;
-      case 'node':
-        Hacker.findOne({user:user})
-          .then(res=>{
-            if(res == null){
-              let newUser = new Hacker({user:user});
-              newUser.save();
-            }else{
-              res.credits += 20;
-              res.save();
-            }
-          })
-          .catch(err =>{
-            console.log(err);
-          })
-
-        break;
-      case 'stats':
-
-        break;
-      case 'craft':
-
-        break;
-      case 'offer':
-
-        break;
-      case 'accept':
-
-        break;
-      case 'confirm':
-
-        break;
-      default:
-        //bad command
-
-    }
 
     // !hack {node #}: If you are active player hack the numbered node
     // !stats: Display current cr, fvr, scrt, prgm, inf, and items.

@@ -26,11 +26,17 @@ function handleMessage(channel, user, message, self){
           name: "hack",
           target: targetNum
         };
-        sendRequest(user.username, data);
+        sendRequest(user.username, data)
+          .then(res => {
+            client.say(channel, res);
+          })
+          .catch(err =>{
+            console.log("Hack Command Response Error");
+          })
       }else{
         client
           .say(channel, "That is an invalid node number")
-          .then(() => console.log("Message Sent")  )
+          .then((res) => console.log("Message Sent")  )
           .catch((err) => console.log("Couldn't send message:", err))
       }
 
@@ -60,24 +66,31 @@ function handleMessage(channel, user, message, self){
 }
 
 function sendRequest(user, command){
-  if(user == undefined || command == undefined){
-    console.log("Bad Chatbot Request, user or command undefined");
-    return;
-  }
+  return new Promise((resolve,reject)=>{
+    if(user == undefined || command == undefined){
+      reject("Bad Chatbot Request, user or command undefined");
+    }
 
-  let options = {
-    url: "http://localhost:3000/game/chat",
-    method: "POST",
-    headers: {'content-type': 'application/json'},
-    body: JSON.stringify({
-      user: user,
-      command: command
-    })
-  }
+    let options = {
+      url: "http://localhost:3000/game/chat",
+      method: "POST",
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({
+        user: user,
+        command: command
+      })
+    }
 
-  request(options, (err,res,body)=>{
-    // console.log("request result",res);
-  });
+    request(options, (err,res,body)=>{
+      if(err){
+        reject(err);
+      }
+      if(res.statusCode >= 200 && res.statusCode < 300){
+        console.log(res.body);
+        resolve(res.body);
+      }
+    });
+  })
 }
 
 // Finally, connect to the channel

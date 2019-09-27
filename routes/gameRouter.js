@@ -15,8 +15,13 @@ router.post('/overlay', function(req,res,next){
 const fs = require('fs');
 
 router.post('/chat',function(req,res,next){
-  game.handleCommand(req.body.user, req.body.command);
-  res.send();
+  game.handleCommand(req.body.user, req.body.command)
+    .then(result => {
+        res.send(result)
+    })
+    .catch(err => {
+      console.log("Error at gameRouter /chat post:", err);
+    })
 });
 
 module.exports = router;
