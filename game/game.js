@@ -12,12 +12,28 @@ var Item = require('./../mongoose/models/item');
 var Augment = require('./../mongoose/models/augment');
 
 let game = {
+  name: "HACKY HACKY GAME",
   players: [], // Active players
   nodes: [], //Active nodes
+  tickTime: 15000,
 
   nodeDeck: [],
   playerDeck: [],
   corpNodeDeck: [],
+  ready: {
+    nodeDeck: false,
+    playerDeck: false,
+    corpNodeDeck: true,
+    check: function(){
+      if (this.nodeDeck && this.playerDeck && this.corpNodeDeck){
+        return true;
+      }else{
+        return false;
+      }
+    }
+  },
+
+  interval: null,
 
   eventQueue: [], //Information for overlay to process and draw
 
@@ -27,6 +43,7 @@ let game = {
     Hacker.find({})
       .then(res=>{
         this.playerDeck = res;
+        this.ready.playerDeck = true;
       })
       .catch(err =>{
         console.log(err);
@@ -35,16 +52,24 @@ let game = {
     Node.find({})
       .then(res=>{
         this.nodeDeck = res;
+        this.ready.nodeDeck = true;
       })
       .catch(err=>{
         console.log(`Node database read error: ${err}`);
       })
-    //Make database call. Return an array of Players
+
+    //Call Interval until loaded
+    this.interval = setInterval(()=>{
+      if(this.ready.check()){
+        clearInterval(this.interval);
+        this.interval = setInterval(this.tick, this.tickTime);
+
+      }
+    }, 1000)
   },
 
   init: function(){
     /* initialize game variables */
-    return console.log('working');
   },
 
 
@@ -52,7 +77,24 @@ let game = {
   handleCommand: function(user, command){
     /* Takes a users command and executes the correct function */
     return new Promise((resolve,reject) =>{
+
       switch (command.name) {
+        case 'active':
+          Hacker.findOne({user:user})
+            .then(res=>{
+              if(res == null){
+                let newUser = new Hacker({user:user});
+                newUser.save()
+                  .then(final => resolve("New Hacker Created"));
+              }else{
+
+                this.activatePlayer(res);
+                res.save()
+                  .then(final => resolve("updated"));
+              }
+            })
+          break;
+
         case 'hack':
           Hacker.findOne({user:user})
             .then(res=>{
@@ -62,6 +104,7 @@ let game = {
                   .then(final => resolve("New Hacker Created"));
               }else{
                 res.credits += 20;
+                this.activatePlayer(res);
                 res.save()
                   .then(final => resolve("Hack Success"))
                   .catch(err => console.log("uh oh", err));
@@ -72,6 +115,7 @@ let game = {
             })
 
           break;
+
         case 'node':
           Hacker.findOne({user:user})
             .then(res=>{
@@ -80,6 +124,7 @@ let game = {
                 newUser.save();
               }else{
                 res.credits += 20;
+                this.activatePlayer(res);
                 res.save();
               }
             })
@@ -88,6 +133,7 @@ let game = {
             })
 
           break;
+
         case 'stats':
           Hacker.findOne({user:user})
             .then(res=>{
@@ -96,6 +142,7 @@ let game = {
                 newUser.save();
               }else{
                 res.credits += 20;
+                this.activatePlayer(res);
                 res.save();
               }
             })
@@ -132,8 +179,35 @@ let game = {
   },
 
   tick: function(){
-    /* process a game tick */
+    // Set random nonplaced player as the active player
+    // If no nonplaced player available, give all placed players +1 credit
+
+    // For each node reduce time til completion by one
+    // If time til completion is zero run node completion fire
+
+    // For each completed node, remove it from the board.
+    // If corpEmergence is at 0 spawn a corp node and reset the timer
+    // Else corpEmergence reduces by one
+    // For each empty node slot, add a random node
+
+    //Check all active players to see when there last message was, if it has been longer than 10 minutes remove them from active players
+    let currentTime = new Date();
+    game.players = game.players.filter(player => {
+      return currentTime - player.lastMsg < 600000;
+    })
   },
+
+  activatePlayer: function(doc){
+    doc.lastMsg = new Date();
+    let plyr = game.players.find(player =>{
+      return doc.user == player.user;
+    });
+    if(plyr == undefined){
+      game.players.push(doc);
+    }else{
+      plyr.lastMsg = new Date();
+    }
+  }
 }
 
 game.load();

@@ -13,6 +13,10 @@ function handleMessage(channel, user, message, self){
 
   //if this isn't a command, take a hike
   if(message.slice(0,1) != "!"){
+    sendRequest(user.username, {name: "active", target: null})
+      .catch(err=>{
+        console.log("Chatbot Active message request error");
+      })
     return;
   }
 
@@ -86,7 +90,6 @@ function sendRequest(user, command){
         reject(err);
       }
       if(res.statusCode >= 200 && res.statusCode < 300){
-        console.log(res.body);
         resolve(res.body);
       }
     });
