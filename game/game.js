@@ -14,8 +14,10 @@ var Augment = require('./../mongoose/models/augment');
 let game = {
   name: "HACKY HACKY GAME",
   players: [], // Active players
+  chosenPlayer: null,
   nodes: [], //Active nodes
   tickTime: 15000,
+  numNodes: 6,
 
   nodeDeck: [],
   playerDeck: [],
@@ -35,9 +37,10 @@ let game = {
 
   interval: null,
 
-  eventQueue: [], //Information for overlay to process and draw
+  messageQueue:[],
+  eventQueue: [], // Information for overlay to process and draw
 
-  // functions
+  // Game Functions
   load: function(){
     /* this will load  players/items/etc from the database */
     Hacker.find({})
@@ -62,7 +65,7 @@ let game = {
     this.interval = setInterval(()=>{
       if(this.ready.check()){
         clearInterval(this.interval);
-        this.interval = setInterval(this.tick, this.tickTime);
+        this.init();
 
       }
     }, 1000)
@@ -70,9 +73,53 @@ let game = {
 
   init: function(){
     /* initialize game variables */
+  
+    // for(let i =0; i < this.numNodes; i++){
+    //
+    // }
+
+    this.interval = setInterval(this.tick, this.tickTime);
   },
 
+  tick: function(){
+    // Set random nonplaced player as the active player
+    if(game.players.length > 0){
+      game.chosenPlayer = game.players[randInt(game.players.length)];
+      console.log(game.chosenPlayer);
+    }
+    // Give all active players +1 credit
+    game.players.map(player =>{
+      player.credits += 1;
+      player.save();
+    })
 
+    // For each node reduce time til completion by one
+    // If time til completion is zero run node completion fire
+
+    // For each completed node, remove it from the board.
+    // If corpEmergence is at 0 spawn a corp node and reset the timer
+    // Else corpEmergence reduces by one
+    // For each empty node slot, add a random node
+
+    //Check all active players to see when there last message was, if it has been longer than 10 minutes remove them from active players
+    let currentTime = new Date();
+    game.players = game.players.filter(player => {
+      return currentTime - player.lastMsg < 600000;
+    })
+  },
+
+  // Helper Functions
+  activatePlayer: function(doc){
+    doc.lastMsg = new Date();
+    let plyr = game.players.find(player =>{
+      return doc.user == player.user;
+    });
+    if(plyr == undefined){
+      game.players.push(doc);
+    }else{
+      plyr.lastMsg = new Date();
+    }
+  },
 
   handleCommand: function(user, command){
     /* Takes a users command and executes the correct function */
@@ -178,36 +225,15 @@ let game = {
     // !confirm {player}: Finishes the offer command and will swap items.
   },
 
-  tick: function(){
-    // Set random nonplaced player as the active player
-    // If no nonplaced player available, give all placed players +1 credit
-
-    // For each node reduce time til completion by one
-    // If time til completion is zero run node completion fire
-
-    // For each completed node, remove it from the board.
-    // If corpEmergence is at 0 spawn a corp node and reset the timer
-    // Else corpEmergence reduces by one
-    // For each empty node slot, add a random node
-
-    //Check all active players to see when there last message was, if it has been longer than 10 minutes remove them from active players
-    let currentTime = new Date();
-    game.players = game.players.filter(player => {
-      return currentTime - player.lastMsg < 600000;
-    })
-  },
-
-  activatePlayer: function(doc){
-    doc.lastMsg = new Date();
-    let plyr = game.players.find(player =>{
-      return doc.user == player.user;
-    });
-    if(plyr == undefined){
-      game.players.push(doc);
-    }else{
-      plyr.lastMsg = new Date();
-    }
+  getMessageQueue: function(){
+    let messages = this.messageQueue;
+    this.messageQueue = [];
+    return messages;
   }
+}
+
+function randInt(range){
+  return Math.floor(Math.random() * range);
 }
 
 game.load();

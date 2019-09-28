@@ -24,4 +24,13 @@ router.post('/chat',function(req,res,next){
     })
 });
 
+router.get('/chat', function(req,res,next){
+  if(req.query.command == "messages"){
+    res.send(game.getMessageQueue());
+  }else{
+    res.send();
+  }
+
+})
+
 module.exports = router;

@@ -6,10 +6,13 @@ const options = require('./secrets').options
 const client = new TwitchJS.client(options);
 client.on('chat',handleMessage);
 
+let messageQueue = [];
+
+//Get Message Queue
+setInterval(getMessageQueue,2000);
+
 function handleMessage(channel, user, message, self){
   if (self) return;
-
-  //TODO: update player activity when this comes around.
 
   //if this isn't a command, take a hike
   if(message.slice(0,1) != "!"){
@@ -66,6 +69,10 @@ function handleMessage(channel, user, message, self){
     case "!craft":
       //TODO Build crafting stuffs
       break;
+    case "!test":
+      console.log(channel);
+
+      break;
   }
 }
 
@@ -94,6 +101,43 @@ function sendRequest(user, command){
       }
     });
   })
+}
+
+function getRequest(command){
+  return new Promise((resolve, reject) => {
+    if(command == undefined){
+      reject("Bad Chatbot Command getRequest");
+    }
+
+    let options = {
+      url: "http://localhost:3000/game/chat?command="+ command,
+      method: "GET",
+    }
+
+    request(options, (err,res,body)=>{
+      if(err){
+        reject(err);
+      }
+      if(res.statusCode >= 200 && res.statusCode < 300){
+        resolve(JSON.parse(res.body));
+      }
+    })
+  })
+}
+
+function getMessageQueue(){
+  getRequest("messages")
+    .then(msgs =>{
+      messageQueue = messageQueue.concat(msgs)
+    })
+    .catch(err =>{
+      console.log(err);
+    })
+
+  if(messageQueue.length > 0){
+    console.log(messageQueue);
+    client.say(options.channels[0], messageQueue.shift());
+  }
 }
 
 // Finally, connect to the channel
