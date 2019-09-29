@@ -17,7 +17,7 @@ let game = {
   players: [], // Active players
   chosenPlayer: null,
   nodes: [], //Active nodes
-  tickTime: 15000,
+  tickTime: 5000,
   numNodes: 6,
 
   nodeDeck: [],
@@ -49,7 +49,10 @@ let game = {
         this.playerDeck = res;
         // Clear previous hacking positions
         this.playerDeck.forEach(player =>{
-          player.currentNodeId = -1;
+          if(player.currentNode != -1){
+              player.currentNodeId = -1;
+              player.save();
+          }
         })
         this.ready.playerDeck = true;
       })
@@ -90,27 +93,18 @@ let game = {
     this.interval = setInterval(this.tick, this.tickTime);
   },
 
-  tick: function(){
-    //Remove last chosen players
-    game.chosenPlayer = null;
-    // Set random nonplaced player as the active player
-
-    let eligiblePlayers = game.players.filter(player => {
-      return player.currentNodeId == -1;
-    })
-    if(eligiblePlayers.length > 0){
-          game.chosenPlayer = eligiblePlayers[randInt(game.players.length)];
-          game.sendChat(`@${game.chosenPlayer.user}, It is your turn . . . !hack # to hack a node . . . !nodes to get a list of nodes`);
-    }
+  tick: async function(){
 
     // Give all active players +1 credit
     game.players.map(player =>{
       player.credits += 1;
-      player.save();
+      setTimeout(()=>{
+        player.save();
+      },1000);
     })
 
     // For each node reduce time til completion by one if active
-    game.nodes.forEach(node => {
+    game.nodes.forEach( node => {
       if(node.hacker != null){
         node.integrity--;
         if(node.integrity <= 0){
@@ -128,12 +122,25 @@ let game = {
     game.players = game.players.filter(player => {
       return currentTime - player.lastMsg < 600000;
     })
+    // console.log("tick");
+
+    //Remove last chosen players
+    game.chosenPlayer = null;
+    // Set random nonplaced player as the active player
+
+    let eligiblePlayers = game.players.filter(player => {
+      return player.currentNodeId == -1;
+    })
+    if(eligiblePlayers.length > 0){
+          game.chosenPlayer = eligiblePlayers[randInt(game.players.length)];
+          game.sendChat(`@${game.chosenPlayer.user}, It is your turn . . . !hack # to hack a node . . . !nodes to get a list of nodes`);
+    }
   },
 
   processNode: async function(node){
     // get the hacker from playerDeck
-    // let hacker = this.playerDeck.find(player => player.user = node.hacker);
-    let hacker = await Hacker.findOne({user: node.hacker});
+    let hacker = this.players.find(player => player.user = node.hacker);
+    //let hacker = await Hacker.findOne({user: node.hacker});
     if(hacker == undefined){
       console.log("Error in proccessing node, player not found");
       return;
@@ -185,6 +192,9 @@ let game = {
     }
 
     hacker.currentNodeId = -1;
+    game.players.find(pl => {
+      return pl.user == hacker.user;
+    }).currentNodeId = -1;
 
     let updatedHacker = await hacker.save();
 
@@ -193,6 +203,7 @@ let game = {
     let curIndex = this.nodes.findIndex(nd => node.hacker == nd.hacker);
     this.nodes.splice(curIndex, 1);
     this.nodes.push(clone(this.nodeDeck[randInt(this.nodeDeck.length)]));
+    return true;
   },
 
   // Helper Functions
@@ -279,14 +290,26 @@ let game = {
               if(res == null){
                 this.createNewHacker(user);
               }else{
-                res.credits += 20;
                 this.activatePlayer(res);
                 res.save();
               }
             })
             .catch(err =>{
               console.log(err);
-            })
+            });
+          if( command.target >= this.nodes.length ||
+              command.target < 0){
+                resolve(`@${user}, Could not find node ${command.target}`);
+                return;
+          }
+          let curNode = this.nodes[command.target];
+          let nodeStr = `[${command.target}] - ` +
+                        `${curNode.name} - ` +
+                        `Credits: ${curNode.requirements.credits} - ` +
+                        `Favors: ${curNode.requirements.favors} - ` +
+                        `Secrets: ${curNode.requirements.secrets} - ` +
+                        `Programs: ${curNode.requirements.programs}`;
+          resolve(nodeStr);
 
           break;
 
@@ -318,8 +341,13 @@ let game = {
               if(res == null){
                 this.createNewHacker(user);
               }else{
-                res.credits += 20;
                 this.activatePlayer(res);
+                let statsStr =  `@${user}, `+
+                                `Credits: ${res.credits} . . ` +
+                                `Favors: ${res.favors} . . ` +
+                                `Secrets: ${res.secrets} . . ` +
+                                `Programs: ${res.programs}`;
+                this.sendChat(statsStr);
                 res.save();
               }
             })
@@ -341,10 +369,7 @@ let game = {
 
           break;
         case 'test':
-          let testNode = this.nodes[0];
-          testNode.hacker = "phlip45";
-          this.processNode(testNode);
-          break;
+
       }
     })
 

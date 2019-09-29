@@ -55,7 +55,13 @@ function handleMessage(channel, user, message, self){
           name: "node",
           target: nodeNum
         };
-        sendRequest(user.username, data);
+        sendRequest(user.username, data)
+          .then(res => {
+            client.say(channel, res);
+          })
+          .catch(err =>{
+            console.log("Node Command Response Error");
+          })
       }else{
         client
           .say(channel, "That is an invalid node number")
