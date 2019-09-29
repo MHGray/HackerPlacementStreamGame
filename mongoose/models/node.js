@@ -70,6 +70,11 @@ let Node = new Schema({
     required: true,
     default: 5
   },
+  hacker:{
+    type: String,
+    required: false,
+    default: null
+  },
   difficulty:{
     type: Number,
     required: true,

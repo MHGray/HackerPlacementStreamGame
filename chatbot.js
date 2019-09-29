@@ -18,7 +18,7 @@ function handleMessage(channel, user, message, self){
   if(message.slice(0,1) != "!"){
     sendRequest(user.username, {name: "active", target: null})
       .catch(err=>{
-        console.log("Chatbot Active message request error");
+        console.log("Chatbot Active message request error: ", err);
       })
     return;
   }
@@ -63,6 +63,9 @@ function handleMessage(channel, user, message, self){
           .catch((err) => console.log("Couldn't send message:", err))
       }
       break;
+    case "!nodes":
+      sendRequest(user.username, {name: "nodelist", target: null});
+      break;
     case "!stats":
       sendRequest(user.username, {name: "stats", target: null});
       break;
@@ -70,7 +73,7 @@ function handleMessage(channel, user, message, self){
       //TODO Build crafting stuffs
       break;
     case "!test":
-      console.log(channel);
+      sendRequest(user.username, {name: "test", target: null});
 
       break;
   }
@@ -95,6 +98,10 @@ function sendRequest(user, command){
     request(options, (err,res,body)=>{
       if(err){
         reject(err);
+      }
+      if(res == undefined){
+        reject("request respopnse is undefined in ChatBot");
+        return;
       }
       if(res.statusCode >= 200 && res.statusCode < 300){
         resolve(res.body);
