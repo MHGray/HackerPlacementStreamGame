@@ -17,7 +17,7 @@ let game = {
   players: [], // Active players
   chosenPlayer: null,
   nodes: [], //Active nodes
-  tickTime: 5000,
+  tickTime: 150000,
   numNodes: 6,
 
   nodeDeck: [],
